@@ -1,0 +1,8 @@
+id: hello
+namespace: dev
+
+tasks:
+  - id: hello
+    type: io.kestra.core.tasks.scripts.Bash
+    commands:
+      - echo "Hello from Kestra!"

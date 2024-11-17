@@ -1,0 +1,45 @@
+services:
+  kestra:
+    image: kestra/kestra:latest
+    environment:
+      KESTRA_CONFIGURATION: |
+        kestra:
+          repository:
+            type: postgres
+          queue:
+            type: postgres
+          storage:
+            type: local
+            local:
+              baseDirectory: "/tmp/storage"
+          jdbc:
+            url: jdbc:postgresql://postgres/kestra
+            username: kestra
+            password: k3str4
+    ports:
+      - "8080:8080"
+    volumes:
+      - kestra_storage:/tmp/storage
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:14
+    environment:
+      POSTGRES_DB: kestra
+      POSTGRES_USER: kestra
+      POSTGRES_PASSWORD: k3str4
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kestra"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  kestra_storage:
